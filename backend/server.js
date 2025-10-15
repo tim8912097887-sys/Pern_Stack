@@ -4,6 +4,7 @@ import morgan from "morgan";
 import 'dotenv/config';
 import productRouter from "./product/routes/product.routes.js";
 import { sql } from "./config/db.js";
+import { handleError } from "./middleware/errorhandler.js";
 const app = express();
 const port = process.env.BACKENDPORT || 5001;
 
@@ -38,6 +39,8 @@ initDB().then(() => {
    app.listen(port,() => console.log(`Server is running on port ${port}`));
 })
 
+// handle error
+app.use(handleError);
 
 // test
 app.get('/',(req,res) => {

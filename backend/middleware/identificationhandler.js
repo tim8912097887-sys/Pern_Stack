@@ -1,8 +1,7 @@
+import { ApiError } from "../customerror/apierror.js";
+
 export const handleIdentification = (req,res,next) => {
-    const { id } = req.param;
-    if(typeof id !== "number") {
-        res.status(400);
-        throw new Error('Id must be number');
-    }
+    const { id } = req.params;
+    if(isNaN(id)) throw new ApiError(400,'Id is number');
     next();
 }
