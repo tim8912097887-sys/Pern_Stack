@@ -5,6 +5,9 @@ import 'dotenv/config';
 import productRouter from "./product/routes/product.routes.js";
 import { sql } from "./config/db.js";
 import { handleError } from "./middleware/errorhandler.js";
+import expressAsyncHandler from "express-async-handler";
+import { aj } from "./lib/arcjet.js";
+import { ApiError } from "./customerror/apierror.js";
 const app = express();
 const port = process.env.BACKENDPORT || 5001;
 
@@ -15,6 +18,25 @@ app.use(helmet());
 // log the request
 app.use(morgan("dev"));
 
+app.use(expressAsyncHandler(async (req,res,next) => {
+      const decision = await aj.protect(req,{ requested: 1 });
+      
+      if(decision.isDenied()) {
+            if(decision.reason.isRateLimit()) {
+            throw new ApiError(429,'Too many requests');
+        } else if(decision.reason.isBot()) {
+            throw new ApiError(403,'No bots allowed');
+        } else {
+            throw new ApiError(403,'Forbidden');
+        }
+      }
+      
+    // check for spoofed bot
+    if(decision.results.some(result =>  result.reason.isBot() && result.reason.isSpoofed())) {
+        throw new ApiError(403,'Spoofed bot detected');
+    }
+    next();
+}))
 // route
 app.use('/api/products',productRouter);
 
