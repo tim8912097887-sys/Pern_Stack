@@ -6,7 +6,7 @@ import productRouter from "./product/routes/product.routes.js";
 import { sql } from "./config/db.js";
 import { handleError } from "./middleware/errorhandler.js";
 import expressAsyncHandler from "express-async-handler";
-import { aj } from "./lib/arcjet.js";
+// import { aj } from "./lib/arcjet.js";
 import { ApiError } from "./customerror/apierror.js";
 const app = express();
 const port = process.env.BACKENDPORT || 5001;
@@ -18,25 +18,25 @@ app.use(helmet());
 // log the request
 app.use(morgan("dev"));
 
-app.use(expressAsyncHandler(async (req,res,next) => {
-      const decision = await aj.protect(req,{ requested: 1 });
+// app.use(expressAsyncHandler(async (req,res,next) => {
+//       const decision = await aj.protect(req,{ requested: 1 });
       
-      if(decision.isDenied()) {
-            if(decision.reason.isRateLimit()) {
-            throw new ApiError(429,'Too many requests');
-        } else if(decision.reason.isBot()) {
-            throw new ApiError(403,'No bots allowed');
-        } else {
-            throw new ApiError(403,'Forbidden');
-        }
-      }
+//       if(decision.isDenied()) {
+//             if(decision.reason.isRateLimit()) {
+//             throw new ApiError(429,'Too many requests');
+//         } else if(decision.reason.isBot()) {
+//             throw new ApiError(403,'No bots allowed');
+//         } else {
+//             throw new ApiError(403,'Forbidden');
+//         }
+//       }
       
-    // check for spoofed bot
-    if(decision.results.some(result =>  result.reason.isBot() && result.reason.isSpoofed())) {
-        throw new ApiError(403,'Spoofed bot detected');
-    }
-    next();
-}))
+//     check for spoofed bot
+//     if(decision.results.some(result =>  result.reason.isBot() && result.reason.isSpoofed())) {
+//         throw new ApiError(403,'Spoofed bot detected');
+//     }
+//     next();
+// }))
 // route
 app.use('/api/products',productRouter);
 
@@ -51,15 +51,20 @@ const initDB = async () =>{
              create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
            )
         `
-        console.log('database successfully created');
+        console.log('Database schema successfully checked/created.');
     } catch (error) {
         console.error(error);
     }
 }
 
-initDB().then(() => {
-   app.listen(port,() => console.log(`Server is running on port ${port}`));
-})
+if (process.env.NODE_ENV !== 'test') {
+    initDB().then(() => {
+        // Start server only after database initialization is complete
+        app.listen(port, () => {
+            console.log(`Server running on port ${port}`);
+        });
+    });
+}
 
 // handle error
 app.use(handleError);
@@ -68,3 +73,5 @@ app.use(handleError);
 app.get('/',(req,res) => {
     res.json({ msg: "hello world" });
 })
+
+export default app;
