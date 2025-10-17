@@ -1,8 +1,10 @@
-import request from 'supertest'; // Import the service file
+import supertestAgent from 'supertest';
 import app from '../server.js';
 import { createProductService, deleteProductService, getProductService, getProductsService, updateProductService } from '../product/services/product.services.js';
 import { ApiError } from '../customerror/apierror.js';
 
+// ✅ Initialize the request object using const. This variable holds the Supertest agent.
+const request = supertestAgent(app);
 // Mock the indiviual function from module with mock factory function
 jest.mock('../product/services/product.services.js',() => ({
     getProductsService: jest.fn(),
@@ -30,7 +32,7 @@ describe('GET /api/products', () => {
         getProductsService.mockResolvedValue(mockProducts);
 
         // 2. Make the HTTP GET request using Supertest
-        const response = await request(app)
+        const response = await request
             .get('/api/products') // The route defined in your Express app
             .expect('Content-Type', /json/) // Check that it returns JSON
             .expect(200); // Check the HTTP status code
@@ -64,7 +66,7 @@ describe('GET /api/products/id',() => {
         getProductService.mockResolvedValue(mockProduct);
 
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .get(`/api/products/${id}`)
                               .expect('Content-Type', /json/)
                               .expect(200);
@@ -78,7 +80,7 @@ describe('GET /api/products/id',() => {
     it('should return 400 statusCode and message "Id is number"',async () => {
 
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .get('/api/products/ty')
                               .expect(400);
         // expect(getProductService).toHaveBeenCalledTimes(0);
@@ -91,7 +93,7 @@ describe('GET /api/products/id',() => {
  
         getProductService.mockRejectedValue(new ApiError(404,`User with id: ${id} not found`));
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .get(`/api/products/${id}`)
                               .expect(404);
         expect(getProductService).toHaveBeenCalledTimes(1);
@@ -116,7 +118,7 @@ describe('POST /api/products',() => {
         createProductService.mockResolvedValue(mockProduct);
 
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .post('/api/products')
                               .send(mockProduct)
                               .expect('Content-Type', /json/)
@@ -132,7 +134,7 @@ describe('POST /api/products',() => {
 
         const { id,name,...failInput } = mockProduct;
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .post('/api/products')
                               .send(failInput)
                               .expect(400);
@@ -146,7 +148,7 @@ describe('POST /api/products',() => {
 
         const failInput = { ...mockProduct,name: 'r' };
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .post('/api/products')
                               .send(failInput)
                               .expect(400);
@@ -172,7 +174,7 @@ describe('PUT /api/products',() => {
         updateProductService.mockResolvedValue(mockProduct);
 
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .put(`/api/products/${id}`)
                               .send(mockProduct)
                               .expect('Content-Type', /json/)
@@ -187,7 +189,7 @@ describe('PUT /api/products',() => {
     it('should return 400 statusCode and message "Id is number"',async () => {
  
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .put('/api/products/1er')
                               .send(mockProduct)
                               .expect(400);
@@ -201,7 +203,7 @@ describe('PUT /api/products',() => {
  
 
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .put(`/api/products/${id}`)
                               .expect(400);
         expect(updateProductService).toHaveBeenCalledTimes(0);
@@ -214,7 +216,7 @@ describe('PUT /api/products',() => {
  
         updateProductService.mockRejectedValue(new ApiError(404,`User with id: ${id} not found`));
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .put('/api/products/1')
                               .send(mockProduct)
                               .expect(404);
@@ -236,7 +238,7 @@ describe('DELETE /api/products',() => {
         updateProductService.mockResolvedValue();
 
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .delete(`/api/products/${id}`)
                               .expect(200);
 
@@ -248,7 +250,7 @@ describe('DELETE /api/products',() => {
     it('should return 400 statusCode and message "Id is number"',async () => {
  
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .delete('/api/products/1er')
                               .expect(400);
         expect(deleteProductService).toHaveBeenCalledTimes(0);
@@ -261,7 +263,7 @@ describe('DELETE /api/products',() => {
  
         deleteProductService.mockRejectedValue(new ApiError(404,`User with id: ${id} not found`));
         // mock http request
-        const response = await request(app)
+        const response = await request
                               .delete(`/api/products/${id}`)
                               .expect(404);
         expect(deleteProductService).toHaveBeenCalledTimes(1);
