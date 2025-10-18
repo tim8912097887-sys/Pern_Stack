@@ -6,7 +6,6 @@ import 'dotenv/config';
 import productRouter from "./product/routes/product.routes.js";
 import { sql } from "./config/db.js";
 import { handleError } from "./middleware/errorhandler.js";
-import { rateLimiter } from "./middleware/ratelimiting.js";
 //import expressAsyncHandler from "express-async-handler";
 // import { aj } from "./lib/arcjet.js";
 //import { ApiError } from "./customerror/apierror.js";
