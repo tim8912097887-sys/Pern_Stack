@@ -6,9 +6,10 @@ import 'dotenv/config';
 import productRouter from "./product/routes/product.routes.js";
 import { sql } from "./config/db.js";
 import { handleError } from "./middleware/errorhandler.js";
-import expressAsyncHandler from "express-async-handler";
+import { rateLimiter } from "./middleware/ratelimiting.js";
+//import expressAsyncHandler from "express-async-handler";
 // import { aj } from "./lib/arcjet.js";
-import { ApiError } from "./customerror/apierror.js";
+//import { ApiError } from "./customerror/apierror.js";
 const app = express();
 const port = process.env.BACKENDPORT || 5001;
 
@@ -52,7 +53,16 @@ const initDB = async () =>{
              image VARCHAR(255) NOT NULL,
              price DECIMAL(10,2) NOT NULL,
              create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-           )
+           );
+        `
+        await sql`
+          CREATE TABLE IF NOT EXISTS limits (
+             id SERIAL PRIMARY KEY,
+             ip VARCHAR(255) NOT NULL,
+             count INTEGER NOT NULL,
+             expireat BIGINT NOT NULL,
+             create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+           );
         `
         console.log('Database schema successfully checked/created.');
     } catch (error) {

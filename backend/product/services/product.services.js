@@ -34,7 +34,7 @@ export const updateProductService = async (id,updateValue) => {
     if(product.length < 1) throw new ApiError(404,`User with id: ${id} not found`);
     const { name,image,price } = updateValue;
     const updatedProduct = await sql`
-      Update products
+      UPDATE products
       SET name=${name},
           image=${image},
           price=${price}
