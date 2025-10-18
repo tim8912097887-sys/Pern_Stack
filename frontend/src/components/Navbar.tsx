@@ -4,8 +4,8 @@ const Navbar = () => {
   return (
     <div>
       Navbar
-      <Link to='/'>Home</Link>
-      <Link to='/products'>Products</Link>      
+      <Link to='/'>Home</Link>   
+      <Link to='/Create'>Create</Link>      
     </div>
   )
 }
