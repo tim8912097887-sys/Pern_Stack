@@ -23,7 +23,8 @@
     "express-slow-down": "^3.0.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@babel/core": "^7.28.4",
