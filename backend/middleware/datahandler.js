@@ -1,4 +1,3 @@
-import { ApiError } from "../customerror/apierror.js";
 import { Product } from "../schema/product.schema.js";
 
 export const handleData = (req,res,next) => {
