@@ -13,6 +13,7 @@ type CrudAction = {
    deleteProduct: (id: number) => Promise<void>
    updateProduct: (id: number,product: ProductType) => Promise<void>
    getProducts: () => Promise<void>
+   setError: (errorMessage: string) => void
 }
 
 export const useProductStore = create<State & CrudAction>(
@@ -20,6 +21,9 @@ export const useProductStore = create<State & CrudAction>(
        products: [],
        error: "",
        loading: true,
+       setError: (errorMessage: string) => {
+          set({ error: errorMessage });
+       },
        createProduct: async (product: ProductType) => {
         set({ loading: true });
         try {
@@ -94,7 +98,7 @@ export const useProductStore = create<State & CrudAction>(
         }
        }, 
        updateProduct: async (id: number,product: ProductType) => {
-        set({ loading: true });
+        set({ loading: true });  
         try {
           const response = await productAxios({ method: 'put', url: `/${id}`,data: product });
           

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import type { ProductType } from "../schemas/product.schemas"
 import { useProductStore } from "../stores/useProductStore"
 
@@ -16,6 +17,7 @@ const Product = ({ product }:Product) => {
     <div>
        <p>{product.name}</p>
        <button onClick={() => handleDelete(product.id)}>Delete</button>
+       <Link to={`/update/${product.id}`}>Update</Link>
     </div>
   )
 }
