@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useProductStore } from "../stores/useProductStore"
+import Product from "./Product";
 
 const Home = () => {
 
@@ -10,13 +11,13 @@ const Home = () => {
 
   useEffect(() => {
       getProducts();
-  },[])
+  },[products])
   return (
     <div>
       {loading && <div>Loading...</div>}
       {(error !== "") && <div>{error}</div>}
       {!loading && (error !== "") && products.map(product => {
-        return <p>{product.name}</p>
+        return <Product key={product.id} product={product} />
       })}
     </div>
   )

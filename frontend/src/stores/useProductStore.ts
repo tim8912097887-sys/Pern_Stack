@@ -1,21 +1,17 @@
 import { create } from "zustand"
 import { productAxios } from "../config/axiosInstance"
+import type { ProductType } from "../schemas/product.schemas"
 
-export type Product = {
-    name: string
-    image: string
-    price: number
-}
 type State = {
-    products: (Product&{id: number})[]
+    products: (ProductType&{id: number})[]
     error: string
     loading: boolean
 }
 type CrudAction = {
-   createProduct: (product: Product) => Promise<void>
-   getProduct: (id: number) => Promise<Product&{ id: number }>
+   createProduct: (product: ProductType) => Promise<void>
+   getProduct: (id: number) => Promise<ProductType&{ id: number }>
    deleteProduct: (id: number) => Promise<void>
-   updateProduct: (id: number,product: Product) => Promise<void>
+   updateProduct: (id: number,product: ProductType) => Promise<void>
    getProducts: () => Promise<void>
 }
 
@@ -24,7 +20,7 @@ export const useProductStore = create<State & CrudAction>(
        products: [],
        error: "",
        loading: true,
-       createProduct: async (product: Product) => {
+       createProduct: async (product: ProductType) => {
         set({ loading: true });
         try {
           const response = await productAxios({ method: 'post',url: "/",data: product });
@@ -50,12 +46,10 @@ export const useProductStore = create<State & CrudAction>(
         try {
           const response = await productAxios({ url: "/" });
 
-           set(() => (
-            {
+           set({
                products: response.data?.data,
                error: ""
-            }
-           ))   
+            })   
         } catch (error: any) {
             if(error.response) {
                set({ error: error.response.data?.message });
@@ -84,7 +78,7 @@ export const useProductStore = create<State & CrudAction>(
        deleteProduct: async (id: number) => {
         set({ loading: true });
         try {
-          const response = await productAxios({ method: 'delete', url: `/${id}` });
+          await productAxios({ method: 'delete', url: `/${id}` });
           
           set((state) => ({
              products: state.products.filter(product => product.id !== id)
@@ -99,7 +93,7 @@ export const useProductStore = create<State & CrudAction>(
             set({ loading: false });
         }
        }, 
-       updateProduct: async (id: number,product: Product) => {
+       updateProduct: async (id: number,product: ProductType) => {
         set({ loading: true });
         try {
           const response = await productAxios({ method: 'put', url: `/${id}`,data: product });
