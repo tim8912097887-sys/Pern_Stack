@@ -6,6 +6,7 @@ import 'dotenv/config';
 import productRouter from "./product/routes/product.routes.js";
 import { sql } from "./config/db.js";
 import { handleError } from "./middleware/errorhandler.js";
+import { userRouter } from "./user/routes/user.routes.js";
 //import expressAsyncHandler from "express-async-handler";
 // import { aj } from "./lib/arcjet.js";
 //import { ApiError } from "./customerror/apierror.js";
@@ -40,27 +41,32 @@ app.use(morgan("dev"));
 //     }
 //     next();
 // }))
+
 // route
 app.use('/api/products',productRouter);
+app.use('/api/users',userRouter);
 
 const initDB = async () =>{
     try {
+       await sql`
+          CREATE TABLE IF NOT EXISTS users (
+             id SERIAL PRIMARY KEY,
+             name VARCHAR(255) NOT NULL,
+             email VARCHAR(255) NOT NULL UNIQUE,
+             password VARCHAR(255) NOT NULL,
+             create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+           );
+        `
+
         await sql`
            CREATE TABLE IF NOT EXISTS products (
              id SERIAL PRIMARY KEY,
              name VARCHAR(255) NOT NULL,
              image VARCHAR(255) NOT NULL,
              price DECIMAL(10,2) NOT NULL,
-             create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-           );
-        `
-        await sql`
-          CREATE TABLE IF NOT EXISTS limits (
-             id SERIAL PRIMARY KEY,
-             ip VARCHAR(255) NOT NULL,
-             count INTEGER NOT NULL,
-             expireat BIGINT NOT NULL,
-             create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+             userId INTEGER NOT NULL,
+             create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+             FOREIGN KEY (userId) REFERENCES users (id)
            );
         `
         console.log('Database schema successfully checked/created.');
